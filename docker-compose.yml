@@ -1,0 +1,27 @@
+services:
+  ytdl-web:
+    build: .
+    image: ytdl-web:latest
+    container_name: ytdl-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MAX_CONCURRENT: "2"        # descargas simultáneas; el resto queda en cola
+      KEEP_FILES: "0"            # 0 = sin historial: se borra al bajarlo y al reiniciar
+      RETENTION_HOURS: "24"      # lo que nunca se bajó se borra tras N horas (0 = nunca)
+      YTDLP_AUTOUPDATE: "1"      # actualiza yt-dlp al arrancar el contenedor
+      ALLOW_PLAYLISTS: "1"
+      APP_USER: "admin"
+      APP_PASSWORD: ""           # si lo llenas, pide usuario/contraseña (Basic Auth)
+      MAX_UPLOAD_MB: "20"        # tamaño máximo de la imagen de fondo que se puede subir
+    volumes:
+      - descargas:/downloads
+      - fondo:/data              # imagen de fondo que subas desde la página
+      # Opcional, para videos con restricción de edad o si YouTube pide "no soy un bot".
+      # En hosts con SELinux (Oracle Linux) usa :ro,Z
+      # - ./cookies.txt:/config/cookies.txt:ro
+
+volumes:
+  descargas:
+  fondo:

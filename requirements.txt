@@ -1,0 +1,6 @@
+# yt-dlp sin fijar versión a propósito: YouTube cambia seguido y conviene la más reciente.
+# El extra [default] incluye yt-dlp-ejs (solucionador de retos JS) y mutagen (portadas).
+yt-dlp[default]
+flask>=3.0
+Pillow>=10.0
+gunicorn>=22.0

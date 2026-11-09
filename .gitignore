@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Datos locales que no deben subirse
+cookies.txt
+descargas/
+.env
+
+# Fondo predeterminado personal (puede ser arte con derechos de autor).
+# Si existe, la app lo usa en lugar de app/static/bg-default.jpg.
+app/static/bg.jpg
+
+# Windows / WSL
+*:Zone.Identifier
+Thumbs.db
+desktop.ini

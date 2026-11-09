@@ -1,0 +1,215 @@
+{%- set p = t.page -%}
+<!doctype html>
+<html lang="{{ lang }}" style="--field: {{ fondo.field }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ p.title }}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d81f2e'/%3E%3Cpath d='M32 13v27m-12-12 12 12 12-12M17 50h30' stroke='%23f4ede1' stroke-width='7' fill='none' stroke-linecap='square'/%3E%3C/svg%3E">
+  <!-- Todo local: la interfaz abre aunque no haya internet -->
+  <link href="static/vendor/fonts/fonts.css" rel="stylesheet">
+  <link href="static/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="static/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================================================================ ANUNCIO -->
+<section class="ad" aria-label="{{ p.aria_main }}">
+  <!-- imagen de fondo (se cambia con el botón de fondo) -->
+  <div class="ad-bg" aria-hidden="true" style="background-image: url('{{ fondo.url }}')"></div>
+  <div class="ad-tone" aria-hidden="true"></div>
+
+  <!-- marcas de impresión -->
+  <span class="crop crop-tl" aria-hidden="true"></span><span class="crop crop-tr" aria-hidden="true"></span>
+  <span class="crop crop-bl" aria-hidden="true"></span><span class="crop crop-br" aria-hidden="true"></span>
+  <span class="target target-1" aria-hidden="true"></span><span class="target target-2" aria-hidden="true"></span>
+
+  <div class="spine" aria-hidden="true"><span>{{ p.spine }}</span></div>
+
+  <span class="jp jp-1" aria-hidden="true">高画質</span>
+  <span class="jp jp-2" aria-hidden="true">原音</span>
+  <span class="jp jp-3" aria-hidden="true">保存・一括</span>
+
+  <div class="ad-body">
+    <header class="masthead">
+      <div class="mast-row">
+        <div>
+          <p class="kicker">ytdl-web &nbsp;/&nbsp; video &nbsp;/&nbsp; audio &nbsp;/&nbsp; 2026</p>
+          <p class="issue">{{ p.issue }}</p>
+        </div>
+        <div class="tag" aria-hidden="true">
+          <span class="barcode"></span>
+          <span class="tag-txt">vol.01<br>¥0 · 2026</span>
+        </div>
+      </div>
+      <p class="tagline">{{ p.tagline }}</p>
+      <p class="sub">{{ p.sub }}</p>
+    </header>
+
+    <div class="ad-grid">
+
+      <!-- el "producto" -->
+      <form id="form" class="device" autocomplete="off">
+        <div class="device-top">
+          <span class="led"></span>
+          <span class="model">YTDL&nbsp;·&nbsp;W26</span>
+          <span class="grille" aria-hidden="true"></span>
+        </div>
+
+        <div class="screen">
+          <label for="url" class="screen-label">{{ p.url_label }}</label>
+          <input id="url" type="url" placeholder="{{ p.placeholder }}" required>
+          <button type="button" id="paste" class="paste" title="{{ p.paste_title }}">{{ p.paste }}</button>
+        </div>
+        <div id="detect" class="detect d-none"></div>
+
+        <p class="q">{{ p.q_what }}</p>
+        <div class="chips">
+          <input type="radio" name="mode" id="mode-video" value="video" checked>
+          <label for="mode-video">video</label>
+          <input type="radio" name="mode" id="mode-audio" value="audio">
+          <label for="mode-audio">audio</label>
+        </div>
+
+        {% if allow_playlists %}
+        <p class="q">{{ p.q_scope }}</p>
+        <div class="chips">
+          <input type="radio" name="scope" id="scope-single" value="single" checked>
+          <label for="scope-single">{{ p.chip_single }}</label>
+          <input type="radio" name="scope" id="scope-playlist" value="playlist">
+          <label for="scope-playlist">{{ p.chip_playlist }}</label>
+          <input type="radio" name="scope" id="scope-channel" value="channel">
+          <label for="scope-channel">{{ p.chip_channel }}</label>
+        </div>
+        {% endif %}
+
+        <div class="fields">
+          <div class="field" id="video-opts">
+            <label for="video-profile">{{ p.f_format }}</label>
+            <select id="video-profile">
+              {% for key, prof in t.profiles.video.items() %}<option value="{{ key }}">{{ prof.label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field d-none" id="audio-opts">
+            <label for="audio-profile">{{ p.f_format }}</label>
+            <select id="audio-profile">
+              {% for key, prof in t.profiles.audio.items() %}<option value="{{ key }}">{{ prof.label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field" id="res-opts">
+            <label for="res">{{ p.f_res }}</label>
+            <select id="res">
+              {% for key, label in t.res.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field d-none" id="tab-opts">
+            <label for="tab">{{ p.f_tab }}</label>
+            <select id="tab">
+              {% for key in channel_tabs %}<option value="{{ key }}">{{ t.tabs[key] }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field d-none" id="limit-opts">
+            <label for="limit">{{ p.f_limit }}</label>
+            <select id="limit">
+              <option value="0">{{ t.limits.all }}</option>
+              {% for n in limits %}<option value="{{ n }}">{{ t.limits.first.format(n=n) }}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <p id="hint" class="hint"></p>
+
+        <label class="toggle">
+          <input type="checkbox" id="auto" checked>
+          <span class="dot"></span>
+          <span>{{ p.toggle }} <em>{{ p.toggle_em }}</em></span>
+        </label>
+
+        <button class="go" type="submit" id="go">{{ p.go }} <i class="bi bi-arrow-down"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <p class="fine">{{ p.fine }}</p>
+
+  <!-- idioma + fondo -->
+  <div class="topbar">
+    <nav class="lang" aria-label="{{ p.lang_label }}">
+      {% for code in langs %}<a href="?lang={{ code }}" data-lang="{{ code }}" hreflang="{{ code }}"{% if code == lang %} class="on" aria-current="true"{% endif %}>{{ code | upper }}</a>{% endfor %}
+    </nav>
+    <button type="button" id="bg-open" class="bg-btn" title="{{ p.bg_btn_title }}"><i class="bi bi-image"></i> {{ p.bg_btn }}</button>
+  </div>
+
+  <!-- cinta con las características -->
+  <div class="ticker" aria-label="{{ p.features_aria }}">
+    <div class="ticker-track">
+      {% for _ in range(2) %}
+      <span {% if loop.index == 2 %}aria-hidden="true"{% endif %}>{% for item in p.ticker %}{{ item }} <b>✦</b> {% endfor %}&nbsp;</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ ÍNDICE -->
+<section class="index" aria-label="{{ p.index_aria }}">
+  <div class="index-head">
+    <h2>{{ p.h_downloads }}</h2>
+    <span class="serif">{{ p.in_progress }}</span>
+    <span id="counter" class="count"></span>
+  </div>
+  <div id="jobs"></div>
+  <p id="empty" class="empty">{{ p.empty }} <span class="serif">{{ p.empty_serif }}</span></p>
+
+  <footer class="lockup">
+    <span class="lk-1">ytdl-web</span><span class="bar-sep"></span>
+    <span class="lk-2">YT-DLP {{ ytdlp_version }}</span><span class="bar-sep"></span>
+    <span class="lk-3">ダウンロード</span>
+    <p class="lk-fine">{{ p.lk_fine }}</p>
+  </footer>
+</section>
+
+<div id="toasts" aria-live="polite"></div>
+
+<!-- ================================================================ FONDO -->
+<dialog id="bg-dialog" class="sheet" aria-labelledby="bg-title">
+  <form method="dialog" class="sheet-in">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <h3 id="bg-title">{{ p.dlg_title }}</h3>
+        <span class="serif">{{ p.dlg_serif }}</span>
+      </div>
+      <button value="close" class="x" aria-label="{{ p.close }}">×</button>
+    </div>
+
+    <div id="bg-preview" class="bg-preview" style="background-image: url('{{ fondo.url }}'); background-color: {{ fondo.field }}">
+      <span id="bg-badge" class="bg-badge">{{ t.js.bg.yours if fondo.custom else t.js.bg.default }}</span>
+    </div>
+
+    <label id="bg-drop" class="drop" data-max-mb="{{ max_upload_mb }}">
+      <input type="file" id="bg-file" accept="image/jpeg,image/png,image/webp,image/gif">
+      <i class="bi bi-upload"></i>
+      <span><b>{{ p.drop_b }}</b> {{ p.drop_rest }}<br>
+      <small>{{ p.drop_small.format(mb=max_upload_mb) }}</small></span>
+    </label>
+
+    <div class="color-row">
+      <label for="bg-color">{{ p.color_label }}</label>
+      <input type="color" id="bg-color" value="{{ fondo.field }}">
+      <code id="bg-hex">{{ fondo.field }}</code>
+      <button type="button" id="bg-auto" class="btn-line" {% if not fondo.override %}disabled{% endif %}>{{ p.auto }}</button>
+    </div>
+    <p class="sheet-note">{{ p.note }}</p>
+
+    <p id="bg-status" class="bg-status" role="status"></p>
+
+    <div class="sheet-actions">
+      <button type="button" id="bg-reset" class="btn-line" {% if not fondo.custom and not fondo.override %}disabled{% endif %}>{{ p.reset }}</button>
+      <button value="close" class="btn-save">{{ p.done }}</button>
+    </div>
+  </form>
+</dialog>
+
+<script>window.T = {{ client|tojson }};</script>
+<script src="static/app.js"></script>
+</body>
+</html>
